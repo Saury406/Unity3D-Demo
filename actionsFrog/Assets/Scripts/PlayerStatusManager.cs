@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//碳状态
+//人物状态
 public enum PlayerStatus
 {
     None//无技能
@@ -13,17 +13,18 @@ public enum PlayerStatus
         , Flash //闪烁
         , Over //穿墙
 }
+
 //游戏状态
 public enum GameSatus
 {
     Start,       //开始
-    RoundCount,   //回合计算
+    LevelCount,   //回合计算
     Normal,       //通常
     Win,          //游戏胜利
     Lose,
 }       //游戏失败
         //民众状态
-public class PlayerStatusManager : MonoBehaviour
+public class PlayerStatusManager
 {
     //游戏相关状态定义和管理
     public PlayerStatus CurrentPlayerStatus;

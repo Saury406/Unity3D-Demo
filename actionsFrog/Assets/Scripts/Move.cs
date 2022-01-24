@@ -13,7 +13,7 @@ public class Move : MonoBehaviour
 
     [Header("Mask")]
     public LayerMask Ground;
-    public Collider2D coll;
+    public Collider2D coll;//指定碰撞盒 判断是否着陆
 
     [Header("Jump")]
     public Text jumpCountText;
@@ -73,8 +73,12 @@ public class Move : MonoBehaviour
             DashCounts++;
             DashCountText.text = DashCounts.ToString();
         }
-      
+
     }
+
+    /// <summary>
+    /// 移动逻辑（待优化）
+    /// </summary>
     void Movement() {
         float horizontalMove = Input.GetAxis("Horizontal");
         
@@ -92,6 +96,9 @@ public class Move : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 冲刺逻辑
+    /// </summary>
     void CanDash() {
         isDashing = true;
         dashTimeLeft = dashTime;
@@ -121,6 +128,9 @@ public class Move : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 能力获取逻辑（待升级）
+    /// </summary>
     void Actions() {
 
         //跳跃控制 && actions.activeSelf
@@ -135,6 +145,9 @@ public class Move : MonoBehaviour
            
     }
 
+    /// <summary>
+    /// 变换动画及判断着陆
+    /// </summary>
     void SwitchAnim() {
         anim.SetBool("isIdle",false);
         if (anim.GetBool("isJumping")) {
