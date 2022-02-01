@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 public class Move : MonoBehaviour
 {
-    private float horizontalMove;
+    private Move instance;//单例 
 
     private Rigidbody2D rb;
     public float moveSpeed = 1.0f;
@@ -31,6 +31,13 @@ public class Move : MonoBehaviour
 
     private bool isDashing, isJumping;
 
+    private Queue<GameObject> propQueue = new Queue<GameObject>();//创建Prop储存队列
+    private static GameObject statusCurrentIndex;
+
+     void Awake()
+    {
+        instance = this;
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -52,7 +59,11 @@ public class Move : MonoBehaviour
         Dash();
         if (isDashing) return;//防止冲刺时给其他行为中断
         Movement();
-        Actions();
+        Jump();
+    }
+
+    void Action() {
+        if (statusCurrentIndex) { PropOutQueue(); }
     }
 
     /// <summary>
@@ -61,17 +72,21 @@ public class Move : MonoBehaviour
     /// <param name="collision"></param>
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        PropInQueue(collision.gameObject);//毁前入队
+
         if (collision.tag == "Prop_Jump")
         {
             Destroy(collision.gameObject);
             jumpCounts++;
             jumpCountText.text = jumpCounts.ToString();
+            PlayerStatusManager.CurrentPlayerStatus = PlayerStatus.Jump;//跳跃状态
         }
 
         if (collision.tag == "Prop_Dash") {
             Destroy(collision.gameObject);
             DashCounts++;
             DashCountText.text = DashCounts.ToString();
+            PlayerStatusManager.CurrentPlayerStatus = PlayerStatus.Dash;//冲刺状态
         }
 
     }
@@ -131,9 +146,9 @@ public class Move : MonoBehaviour
     /// <summary>
     /// 能力获取逻辑（待升级）
     /// </summary>
-    void Actions() {
+    void Jump() {
 
-        //跳跃控制 && actions.activeSelf
+        //跳跃控制 && Jump.activeSelf
         if (Input.GetKeyDown(KeyCode.K) && coll.IsTouchingLayers(Ground) && jumpCounts > 0) {
             rb.velocity = new Vector2(rb.velocity.x,jumpForce * Time.deltaTime);
             anim.SetBool("isJumping",true);
@@ -163,5 +178,24 @@ public class Move : MonoBehaviour
        
     }
 
-   
+    /// <summary>
+    /// prop入队
+    /// </summary>
+    public void PropInQueue(GameObject statusIndex) 
+    {
+        if (statusIndex.tag != "bg") {
+            propQueue.Enqueue(statusIndex);
+        } 
+    }
+
+    /// <summary>
+    /// prop出队
+    /// </summary>
+    public void PropOutQueue()
+    {
+        statusCurrentIndex = propQueue.Dequeue();//当前队头
+        Debug.Log(statusCurrentIndex);// ??null??
+    }
+
+
 }

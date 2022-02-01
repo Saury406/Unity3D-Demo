@@ -37,4 +37,8 @@ public class MenuCtl : MonoBehaviour
         SceneManager.LoadScene(2);
     }
 
+    public void OnClickQuitInSelecterBtn() {
+        SceneManager.LoadScene(0);
+    }
+
 }

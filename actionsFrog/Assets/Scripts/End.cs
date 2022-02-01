@@ -14,7 +14,7 @@ public class End : MonoBehaviour
         if (collision.tag == "Player")
         {
             currentLevelIndex = SceneManager.GetActiveScene().buildIndex - 3;//获取当前编号 -3 由于level1从build3开始
-            Debug.Log(currentLevelIndex);
+            //Debug.Log(currentLevelIndex);
             light_end.SetActive(true);
             SceneCtl.instance.BeginNextLevel();//开启线程
             //Invoke("nextLevel",2.0f);

@@ -9,6 +9,7 @@ public class Dead : MonoBehaviour
     {
         anim = GetComponent<Animator>();
     }
+
     /// <summary>
     /// 死亡及动画播放
     /// </summary>

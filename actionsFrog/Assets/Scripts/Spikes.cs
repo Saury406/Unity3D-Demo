@@ -6,7 +6,9 @@ public class Spikes : MonoBehaviour
 {
     public Animator anim;
     [Header("LayerMask")]
-    public LayerMask spikesLayer;
+    public LayerMask spikesLayer;//尖刺层级
+    public GameObject DeadPanel;//死亡文本
+    public static bool hasDead = false;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -14,6 +16,8 @@ public class Spikes : MonoBehaviour
         if (collision.IsTouchingLayers(spikesLayer)) {
             anim.SetTrigger("Die");//噶了
             Destroy(collision.gameObject,0.3f);
+            hasDead = true;
         }
     }
+
 }

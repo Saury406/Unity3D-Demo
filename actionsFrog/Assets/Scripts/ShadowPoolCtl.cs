@@ -35,7 +35,7 @@ public class ShadowPoolCtl : MonoBehaviour
     public void ReturnPool(GameObject gameObject) {
         //取消启用，等待调用
         gameObject.SetActive(false);
-        //取消显示，加入队列
+        //取消显示，加队
         availableObjects.Enqueue(gameObject);
     }
 
@@ -44,7 +44,7 @@ public class ShadowPoolCtl : MonoBehaviour
         if (availableObjects.Count == 0) {
             FillPool();
         }
-        var outShadow =  availableObjects.Dequeue();
+        var outShadow =  availableObjects.Dequeue();//出队
         outShadow.SetActive(true);
 
         return outShadow;

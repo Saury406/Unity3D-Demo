@@ -59,4 +59,15 @@ public class LevelSelecter : MonoBehaviour
         SceneManager.LoadScene("Level3");
     }
 
+    public void onClickBtnLevel4()
+    {
+        SceneManager.LoadScene("Level4");
+    }
+
+    public void onClickBtnLevel5()
+    {
+        SceneManager.LoadScene("Level5");
+    }
+
+
 }
