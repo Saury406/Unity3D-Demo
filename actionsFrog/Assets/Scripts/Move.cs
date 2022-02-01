@@ -34,7 +34,10 @@ public class Move : MonoBehaviour
     private Queue<GameObject> propQueue = new Queue<GameObject>();//创建Prop储存队列
     private static GameObject statusCurrentIndex;
 
-     void Awake()
+    TaskQueue taskQueue = new TaskQueue();//创建全局任务
+    Task actionMasterTask;
+
+    void Awake()
     {
         instance = this;
     }
@@ -42,7 +45,6 @@ public class Move : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        
     }
 
      void Update()
@@ -51,20 +53,29 @@ public class Move : MonoBehaviour
         {
             CanDash();
         }
+       
     }
 
     void FixedUpdate()
     {
+       
         SwitchAnim();
-        Dash();
-        if (isDashing) return;//防止冲刺时给其他行为中断
         Movement();
-        Jump();
+        //若任务总量大于0
+        if (taskQueue.m_TasksNum > 0) {
+            if (jumpCounts > 0 && taskQueue._currentName == "Jump") {
+                Jump();
+            }
+
+            if (DashCounts > 0 && taskQueue._currentName == "Dash") {
+                Dash();
+            }
+            
+        }
+        Debug.Log("TaskProcess:" + taskQueue.TaskProcess);
+        Debug.Log("MaxNum:" + taskQueue.m_TasksNum);
     }
 
-    void Action() {
-        if (statusCurrentIndex) { PropOutQueue(); }
-    }
 
     /// <summary>
     /// 碰撞检测
@@ -72,20 +83,25 @@ public class Move : MonoBehaviour
     /// <param name="collision"></param>
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        PropInQueue(collision.gameObject);//毁前入队
-
+        //PropInQueue(collision.gameObject);//毁前入队
         if (collision.tag == "Prop_Jump")
         {
             Destroy(collision.gameObject);
             jumpCounts++;
             jumpCountText.text = jumpCounts.ToString();
-            PlayerStatusManager.CurrentPlayerStatus = PlayerStatus.Jump;//跳跃状态
+            taskQueue.OnStart = () => Debug.Log("OnStart"); 
+            taskQueue.OnFinish = () => Debug.Log("OnFinish");
+            taskQueue.AddTask(Jump,"Jump");//添加Jump任务
+            taskQueue.Start();
+            PlayerStatusManager.CurrentPlayerStatus = PlayerStatus.Jump;//改为跳跃状态
         }
 
         if (collision.tag == "Prop_Dash") {
             Destroy(collision.gameObject);
             DashCounts++;
             DashCountText.text = DashCounts.ToString();
+            taskQueue.AddTask(Dash,"Dash");//添加Dash任务
+            taskQueue.Start();
             PlayerStatusManager.CurrentPlayerStatus = PlayerStatus.Dash;//冲刺状态
         }
 
@@ -123,6 +139,7 @@ public class Move : MonoBehaviour
 
     void Dash()
     {
+
         if (isDashing) {
             if (dashTimeLeft > 0) {
                 rb.velocity = new Vector2(gameObject.transform.localScale.x * dashSpeed, rb.velocity.y);
@@ -139,6 +156,7 @@ public class Move : MonoBehaviour
                 //减少冲刺次数并返回
                 DashCounts--;
                 DashCountText.text = DashCounts.ToString();
+                Debug.Log("DashDone");
             }
         }
     }
@@ -147,15 +165,14 @@ public class Move : MonoBehaviour
     /// 能力获取逻辑（待升级）
     /// </summary>
     void Jump() {
-
         //跳跃控制 && Jump.activeSelf
-        if (Input.GetKeyDown(KeyCode.K) && coll.IsTouchingLayers(Ground) && jumpCounts > 0) {
+        if (Input.GetKeyDown(KeyCode.K) && coll.IsTouchingLayers(Ground)) {
             rb.velocity = new Vector2(rb.velocity.x,jumpForce * Time.deltaTime);
             anim.SetBool("isJumping",true);
-            if (jumpCounts > 0) {
-                jumpCounts--;
-                jumpCountText.text = jumpCounts.ToString();
-            }
+            
+            jumpCounts--;
+            jumpCountText.text = jumpCounts.ToString(); 
+            Debug.Log("JumpDone");
         }
            
     }
@@ -196,6 +213,8 @@ public class Move : MonoBehaviour
         statusCurrentIndex = propQueue.Dequeue();//当前队头
         Debug.Log(statusCurrentIndex);// ??null??
     }
+
+
 
 
 }
